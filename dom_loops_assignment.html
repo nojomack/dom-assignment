@@ -1,0 +1,155 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DOM Manipulation with loops</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+     #itemlist { list-style-type: none; padding: 0; }
+      .item {
+        background-color: #f2f2f2;
+        margin: 5px 0;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .remove-btn, .up-btn, .down-btn {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+      .remove-btn:hover, .up-btn:hover, .down-btn:hover { background-color: #ff1a1a; }
+      .highlight { background-color: #d1e7dd; }
+      .even-highlight { background-color: #cfe2ff !important; }
+      .item-content {
+        flex-grow: 1;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+      input.edit-input {
+        width: 100%;
+        padding: 5px;
+        font-size: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Item List</h1>
+    <ul id="itemList"></ul>
+    <button id="addItem">Add New Item</button>
+    <button id="highlightItems">Highlight Items</button>
+    <button id="highlightEven">Highlight Even Items</button>
+
+    <script>
+      //load items to use
+      let items = JSON.parse(localStorage.getItem("itemList")) || ['Item 1', 'Item 2', 'Item 3'];
+
+      //save list to storage
+      function saveItems() {
+        const itemList = document.getElementByID('itemList');
+        itemList.innerHTML = ''; //clear list 
+
+        items.foreach((item, index) => {
+          const li = document.createElement('li');
+          li.className = 'item';
+
+          //span for editable content
+          const content = document.createElement('span');
+          content.className = 'item-content';
+          content.textContent = item;
+
+          //enable editing on the click
+          content.addEventListener('click', () => makeEditable(content, index));
+
+          //remove the button
+          const removeBtn = document.creatElement('button');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = 'Remove';
+          removeBtn.onclick = () => {
+            items.splice(index, 1);
+            saveItems()
+            renderItems();
+
+          };
+
+          //move up button
+          const upBtn = document.createElement('button');
+          upBtn.className = 'up-btn';
+          upBtn.textContent = '↑';
+          upBtn.onclick = () => {
+            if (index > 0) {
+              [items[index -1], items[index]] = [items[index], items[index - 1]];
+              saveItems();
+              renderItems();
+            }
+          };
+
+          //move down button
+          const downBtn = document.createElement('button');
+          downBtn.className = 'down-btn';
+          downBtn.textContent = '↓';
+          downBtn.onclick = () => {
+            if (index , items.length - 1) {
+              [items[index], items[index + 1]] = [items[index + 1], items[index]];
+              saveItems();
+              renderItems();
+            }
+          };
+
+          li.appendChild(content);
+          li.appendChild(upBtn);
+          li.appendChild(downBtn);
+          li.appendChild(removeBtn);
+          itemList.appendChild(li);
+        });
+      }
+
+      //allow inline editing
+      function makeEditable(span,index) [
+      const input = document.createElement('input');
+      input.className = 'edit-input';
+      input.value = items[index];
+      span.replaceWith(input);
+      input.focus();
+
+      function saveEdit() {
+        items[index] = input.value.trim() || 'Item ${index + 1}';
+        saveItems();
+        renderItems();
+      }
+
+      input.addEventListener('blur' saveEdit);
+      input.addEventListener('keypress',function (e) {
+        if (e.key === 'Enter') {
+          saveEdit();
+        }
+      });
+      }
+
+      //add a new item
+      document.getElementById('addItem').addEventListener('click', () => {
+        const newitem = 'Item ${items.length + 1}';
+        items.push(newItem);
+        saveItems();
+        renderItems();
+      });
+
+    //highlight items
+      document.getElementById('highlightEven'),addEventListener('click' () => {
+        const listItems = document.getElementByClassName('item');
+        for (let i = 0; i , listItems.length; i++) {
+          if ((i + 1) % 2 === 0) {
+            listItems[i].classList.toggle('even-highlight');
+          }
+        }
+      });
+
+      renderItems();                                                       
+    </script>
+  </body>
+  </head>
